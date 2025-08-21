@@ -2,14 +2,15 @@
 
 import PrimarySearchAppBar from '@/components/Appbar';
 import ClippedDrawer from '@/components/Drawer';
+import TenantNotFound from '@/components/TenantNotFound';
 import useDrawer from '@/hooks/useDrawer';
 import { Box, CssBaseline } from '@mui/material';
+import { styled } from '@mui/material/styles';
 import Toolbar from '@mui/material/Toolbar';
 import { Geist, Geist_Mono } from 'next/font/google';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import './globals.css';
 import { Providers } from './providers';
-import { styled } from '@mui/material/styles';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -51,23 +52,41 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const {open, drawerWidth, toggleDrawer} = useDrawer();
+  const { open, drawerWidth, toggleDrawer } = useDrawer();
+  const [tenant, setTenant] = useState<string | null>(null);
+
+  useEffect(() => {
+    const splittedUrl = window.location.hostname.split('.');
+    console.log(splittedUrl.length, process.env.NODE_ENV);
+    if ((process.env.NODE_ENV === 'production' && splittedUrl.length > 2) || splittedUrl.length > 1) {
+      setTenant(splittedUrl[0]);
+    }
+  }, []);
+
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Providers>
-          <Box sx={{ display: 'flex' }}>
-            <CssBaseline />
-            <PrimarySearchAppBar toggleDrawer={toggleDrawer} />
-            <ClippedDrawer drawerWidth={drawerWidth} open={open} toggleDrawer={toggleDrawer} />
-            <Main open={open} width={drawerWidth}>
-              <Toolbar variant='dense' />
-              {children}
-            </Main>
-          </Box>
-        </Providers>
+        {tenant ? (
+          <Providers>
+            <Box sx={{ display: 'flex' }}>
+              <CssBaseline />
+              <PrimarySearchAppBar toggleDrawer={toggleDrawer} />
+              <ClippedDrawer
+                drawerWidth={drawerWidth}
+                open={open}
+                toggleDrawer={toggleDrawer}
+              />
+              <Main open={open} width={drawerWidth}>
+                <Toolbar variant="dense" />
+                {children}
+              </Main>
+            </Box>
+          </Providers>
+        ) : (
+          <TenantNotFound />
+        )}
       </body>
     </html>
   );

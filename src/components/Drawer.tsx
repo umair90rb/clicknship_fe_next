@@ -1,8 +1,17 @@
-import SpaceDashboardIcon from "@mui/icons-material/SpaceDashboard";
-import AssessmentIcon from "@mui/icons-material/Assessment";
-import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import AccountBoxIcon from "@mui/icons-material/AccountBox";
 import AddBoxIcon from "@mui/icons-material/AddBox";
+import AssessmentIcon from "@mui/icons-material/Assessment";
+import CategoryIcon from "@mui/icons-material/Category";
+import ExpandLess from "@mui/icons-material/ExpandLess";
+import ExpandMore from "@mui/icons-material/ExpandMore";
+import GroupIcon from "@mui/icons-material/Group";
+import LocalShippingIcon from "@mui/icons-material/LocalShipping";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import SpaceDashboardIcon from "@mui/icons-material/SpaceDashboard";
+import StoreIcon from "@mui/icons-material/Store";
+import WidgetsIcon from "@mui/icons-material/Widgets";
 import Box from "@mui/material/Box";
+import Collapse from "@mui/material/Collapse";
 import Divider from "@mui/material/Divider";
 import Drawer from "@mui/material/Drawer";
 import List from "@mui/material/List";
@@ -11,15 +20,6 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Toolbar from "@mui/material/Toolbar";
-import Collapse from "@mui/material/Collapse";
-import ExpandLess from "@mui/icons-material/ExpandLess";
-import ExpandMore from "@mui/icons-material/ExpandMore";
-import GroupIcon from "@mui/icons-material/Group";
-import CategoryIcon from "@mui/icons-material/Category";
-import AccountBoxIcon from "@mui/icons-material/AccountBox";
-import StoreIcon from "@mui/icons-material/Store";
-import LocalShippingIcon from "@mui/icons-material/LocalShipping";
-import WidgetsIcon from "@mui/icons-material/Widgets";
 
 import { useState } from "react";
 
@@ -142,8 +142,8 @@ function ExpandableMenuList({ menu }: ExpandableMenuListProps) {
 
       <Collapse in={open[title]} timeout="auto" unmountOnExit>
         <List component="div" disablePadding dense>
-          {children?.map((child) => (
-            <MenuListItem menu={child} />
+          {children?.map((child, index) => (
+            <MenuListItem key={index} menu={child} />
           ))}
         </List>
       </Collapse>
@@ -161,7 +161,7 @@ function renderMenu(menus: MenuWithChildren[]) {
     >
       {menus.map((menu, index) =>
         "children" in menu ? (
-          <ExpandableMenuList menu={menu} />
+          <ExpandableMenuList key={index} menu={menu} />
         ) : (
           <MenuListItem key={index} menu={menu} />
         )
