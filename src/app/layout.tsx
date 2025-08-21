@@ -9,6 +9,7 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import React from 'react';
 import './globals.css';
 import { Providers } from './providers';
+import { styled } from '@mui/material/styles';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -20,12 +21,37 @@ const geistMono = Geist_Mono({
   subsets: ['latin'],
 });
 
+const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
+  width?: number;
+  open?: boolean;
+}>(({ theme, width }) => ({
+  flexGrow: 1,
+  padding: theme.spacing(0),
+  transition: theme.transitions.create('margin', {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen,
+  }),
+  marginLeft: `-${width}px`,
+  variants: [
+    {
+      props: ({ open }) => open,
+      style: {
+        transition: theme.transitions.create('margin', {
+          easing: theme.transitions.easing.easeOut,
+          duration: theme.transitions.duration.enteringScreen,
+        }),
+        marginLeft: 0,
+      },
+    },
+  ],
+}));
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const {open, toggleDrawer} = useDrawer();
+  const {open, drawerWidth, toggleDrawer} = useDrawer();
   return (
     <html lang="en">
       <body
@@ -35,24 +61,11 @@ export default function RootLayout({
           <Box sx={{ display: 'flex' }}>
             <CssBaseline />
             <PrimarySearchAppBar toggleDrawer={toggleDrawer} />
-            <ClippedDrawer open={open} toggleDrawer={toggleDrawer} />
-            <Box
-              component="main"
-              sx={{
-                flexGrow: 1,
-                p: 3,
-                width: { sm: `calc(100% - ${0}px)` }, // Adjust content width based on drawer state
-                ml: { sm: `${0}px` }, // Adjust content margin based on drawer state
-                transition: (theme) =>
-                  theme.transitions.create(["margin", "width"], {
-                    easing: theme.transitions.easing.sharp,
-                    duration: theme.transitions.duration.enteringScreen,
-                  }),
-              }}
-            >
-              <Toolbar />
+            <ClippedDrawer drawerWidth={drawerWidth} open={open} toggleDrawer={toggleDrawer} />
+            <Main open={open} width={drawerWidth}>
+              <Toolbar variant='dense' />
               {children}
-            </Box>
+            </Main>
           </Box>
         </Providers>
       </body>

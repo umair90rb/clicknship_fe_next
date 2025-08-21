@@ -1,62 +1,200 @@
-import MailIcon from '@mui/icons-material/Mail';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import Box from '@mui/material/Box';
-import Divider from '@mui/material/Divider';
-import Drawer from '@mui/material/Drawer';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import Toolbar from '@mui/material/Toolbar';
+import SpaceDashboardIcon from "@mui/icons-material/SpaceDashboard";
+import AssessmentIcon from "@mui/icons-material/Assessment";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import AddBoxIcon from "@mui/icons-material/AddBox";
+import Box from "@mui/material/Box";
+import Divider from "@mui/material/Divider";
+import Drawer from "@mui/material/Drawer";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import Toolbar from "@mui/material/Toolbar";
+import Collapse from "@mui/material/Collapse";
+import ExpandLess from "@mui/icons-material/ExpandLess";
+import ExpandMore from "@mui/icons-material/ExpandMore";
+import GroupIcon from "@mui/icons-material/Group";
+import CategoryIcon from "@mui/icons-material/Category";
+import AccountBoxIcon from "@mui/icons-material/AccountBox";
+import StoreIcon from "@mui/icons-material/Store";
+import LocalShippingIcon from "@mui/icons-material/LocalShipping";
+import WidgetsIcon from "@mui/icons-material/Widgets";
 
-const drawerWidth = 240;
+import { useState } from "react";
+
+interface MenuItem {
+  title: string;
+  url?: string;
+  Icon?: any;
+}
+
+interface MenuWithChildren extends MenuItem {
+  children?: MenuItem[];
+}
+
+const menus: MenuWithChildren[] = [
+  {
+    title: "Dashboard",
+    url: "/",
+    Icon: SpaceDashboardIcon,
+  },
+  {
+    title: "Reports",
+    url: "/reports",
+    Icon: AssessmentIcon,
+  },
+  {
+    title: "Orders",
+    children: [
+      {
+        title: "All Orders",
+        url: "/orders",
+        Icon: ShoppingCartIcon,
+      },
+      {
+        title: "Add New Order",
+        url: "/orders/add",
+        Icon: AddBoxIcon,
+      },
+      {
+        title: "Customers",
+        url: "/customers",
+        Icon: AccountBoxIcon,
+      },
+      {
+        title: "Products",
+        url: "/products",
+        Icon: WidgetsIcon,
+      },
+    ],
+  },
+  {
+    title: "Setting",
+    url: "/setting",
+    children: [
+      {
+        title: "Categories & Brands",
+        url: "/categories-and-brands",
+        Icon: CategoryIcon,
+      },
+      {
+        title: "Staff",
+        url: "/staff",
+        Icon: GroupIcon,
+      },
+      {
+        title: "Sales Channel",
+        url: "/sales-channel",
+        Icon: StoreIcon,
+      },
+      {
+        title: "Delivery Services Accounts",
+        url: "/delivery-services-accounts",
+        Icon: LocalShippingIcon,
+      },
+    ],
+  },
+];
+
+interface MenuListItemProps {
+  menu: MenuItem;
+}
+
+function MenuListItem({ menu }: MenuListItemProps) {
+  const { url, title, Icon } = menu;
+  return (
+    <ListItem disablePadding dense>
+      <ListItemButton
+        onClick={() => {
+          console.log(url);
+        }}
+      >
+        <ListItemIcon>{Icon && <Icon />}</ListItemIcon>
+        <ListItemText primary={title} />
+      </ListItemButton>
+    </ListItem>
+  );
+}
+
+interface ExpandableMenuListProps {
+  menu: MenuWithChildren;
+}
+
+function ExpandableMenuList({ menu }: ExpandableMenuListProps) {
+  const { url, title, Icon, children } = menu;
+  const [open, setOpen] = useState<{ [key: string]: any }>({});
+  const handleClick = (title: string) => {
+    setOpen((prevOpen) => ({
+      ...prevOpen,
+      [title]: !prevOpen[title],
+    }));
+  };
+  return (
+    <>
+      <ListItemButton onClick={() => handleClick(title)} sx={{}}>
+        <ListItemIcon>
+          {open[title] ? <ExpandLess /> : <ExpandMore />}
+        </ListItemIcon>
+
+        <ListItemText primary={title} />
+      </ListItemButton>
+
+      <Collapse in={open[title]} timeout="auto" unmountOnExit>
+        <List component="div" disablePadding dense>
+          {children?.map((child) => (
+            <MenuListItem menu={child} />
+          ))}
+        </List>
+      </Collapse>
+      <Divider />
+    </>
+  );
+}
+
+function renderMenu(menus: MenuWithChildren[]) {
+  return (
+    <List
+      sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }}
+      component="nav"
+      dense
+    >
+      {menus.map((menu, index) =>
+        "children" in menu ? (
+          <ExpandableMenuList menu={menu} />
+        ) : (
+          <MenuListItem key={index} menu={menu} />
+        )
+      )}
+    </List>
+  );
+}
 
 interface ClippedDrawerProps {
   open: boolean;
+  drawerWidth: number;
   toggleDrawer: () => void;
 }
 
-export default function ClippedDrawer({open, toggleDrawer}: ClippedDrawerProps) {
+export default function ClippedDrawer({
+  open,
+  toggleDrawer,
+  drawerWidth,
+}: ClippedDrawerProps) {
   return (
-      <Drawer
-        anchor="left"
-        open={open}
-        onClose={toggleDrawer}
-        sx={{
-          width: drawerWidth,
-          flexShrink: 0,
-          [`& .MuiDrawer-paper`]: { width: drawerWidth, boxSizing: 'border-box' },
-        }}
-      >
-        <Toolbar />
-        <Box sx={{ overflow: 'auto' }}>
-          <List>
-            {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-              <ListItem key={text} disablePadding>
-                <ListItemButton>
-                  <ListItemIcon>
-                    {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                  </ListItemIcon>
-                  <ListItemText primary={text} />
-                </ListItemButton>
-              </ListItem>
-            ))}
-          </List>
-          <Divider />
-          <List>
-            {['All mail', 'Trash', 'Spam'].map((text, index) => (
-              <ListItem key={text} disablePadding>
-                <ListItemButton>
-                  <ListItemIcon>
-                    {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                  </ListItemIcon>
-                  <ListItemText primary={text} />
-                </ListItemButton>
-              </ListItem>
-            ))}
-          </List>
-        </Box>
-      </Drawer>
+    <Drawer
+      variant="persistent"
+      anchor="left"
+      open={open}
+      onClose={toggleDrawer}
+      sx={{
+        width: drawerWidth,
+        flexShrink: 0,
+        [`& .MuiDrawer-paper`]: { width: drawerWidth, boxSizing: "border-box" },
+      }}
+    >
+      <Toolbar />
+      <Box sx={{ overflow: "auto" }}>{renderMenu(menus)}</Box>
+    </Drawer>
   );
 }

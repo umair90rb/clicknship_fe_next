@@ -12,7 +12,7 @@ export default function Home() {
   if (error) return <Typography>Error: {JSON.stringify(error)}</Typography>;
 
   return (
-    <Box sx={{ p: 4 }}>
+    <Box sx={{ p: 4}}>
       <Typography variant="h4" component="h1" gutterBottom>
         Next.js with Redux RTK Query and MUI
       </Typography>
